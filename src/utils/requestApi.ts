@@ -1,5 +1,5 @@
-import axios from "axios";
-import { VITE_API_BASE_URL } from "@env";
+import { API_BASE_URL } from "@env";
+import axios, { AxiosRequestConfig, ResponseType } from "axios";
 
 type TRequest = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -8,12 +8,12 @@ export const requestApi = async (
   requestType: TRequest,
   body?: any,
   headers?: Record<string, string>,
-  responseType?: string
+  responseType?: ResponseType
 ) => {
-  const baseUrl = VITE_API_BASE_URL;
+  const baseUrl = API_BASE_URL;
 
   try {
-    const baseRequest: Axios.AxiosXHRConfig<ResponseType> = {
+    const baseRequest: AxiosRequestConfig = {
       method: requestType,
       url: `${baseUrl}${path}`,
       headers: headers,

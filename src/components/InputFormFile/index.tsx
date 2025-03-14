@@ -3,7 +3,7 @@ import { styles } from "./styles";
 import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
-import { VITE_API_BASE_URL } from '@env';
+import { API_BASE_URL } from '@env';
 
 interface IInputFormFile extends ButtonProps {
     label: string;
@@ -27,7 +27,7 @@ const InputFormFile = ({ title, label, defaultValue, onChangeImage, ...rest }: I
 
             setLoading(true)
 
-            const { data } = await axios.post<{ url: string }>(`${VITE_API_BASE_URL}/upload`, formData, {
+            const { data } = await axios.post<{ url: string }>(`${API_BASE_URL}/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
