@@ -1,0 +1,28 @@
+{
+  "cli": {
+    "version": ">=0.52.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "image": "sdk-52",
+        "env": {
+          "KOTLIN_VERSION": "1.7.20",
+          "EXPO_USE_LEGACY_WORKFLOW": "1"
+        }
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

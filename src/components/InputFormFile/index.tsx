@@ -1,0 +1,102 @@
+import { ActivityIndicator, Alert, Button, ButtonProps, Image, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { styles } from "./styles";
+import { useState } from "react";
+import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+import { VITE_API_BASE_URL } from '@env';
+
+interface IInputFormFile extends ButtonProps {
+    label: string;
+    defaultValue?: string;
+    onChangeImage: (e?: string) => void;
+
+}
+
+const InputFormFile = ({ title, label, defaultValue, onChangeImage, ...rest }: IInputFormFile) => {
+    const [file, setFile] = useState<string | undefined>(defaultValue);
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const uploadImage = async (file: ImagePicker.ImagePickerAsset) => {
+        try {
+            const formData = new FormData()
+            formData.append('file', {
+                name: file.fileName || 'image.jpeg',
+                type: file.type || 'image/jpeg',
+                uri: file.uri
+            } as any)
+
+            setLoading(true)
+
+            const { data } = await axios.post<{ url: string }>(`${VITE_API_BASE_URL}/upload`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            setFile(data.url);
+            onChangeImage(data.url)
+
+            setLoading(false)
+        } catch(err) {
+            setLoading(false)
+            console.error(err)
+            Alert.alert('Erro', 'Erro ao enviar imagem');
+        }
+    }
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+        
+        if(!result.canceled) {
+            await uploadImage(result.assets[0])
+        }
+    };
+
+    return (
+            <View style={styles.boxInputs}>
+                <Text testID="label" style={styles.labelInputs} >{label}</Text>
+                {file ? (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                        <Image 
+                            source={{
+                                uri: file,
+                                height: 52,
+                                width: 52
+                            }}
+                        />
+
+                        <Button title="Excluir" onPress={() => {
+                            setFile(undefined)
+                            onChangeImage(undefined)
+                        }} color={'#FF4848'} />
+                    </View>
+                ) : (
+                    loading ? (
+                        <ActivityIndicator 
+                            color={'#48C445'}
+                            size={'large'}
+                        />
+                    ) : (
+                        <TouchableOpacity testID="button" style={{
+                            backgroundColor: '#48C445',
+                            height: 42,
+                            flex: 1,
+                            marginTop: 10,
+                            borderRadius: 12,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }} {...rest} onPress={pickImage}>
+                            <Text style={{ fontSize: 16, color: '#FFFFFF', textTransform: 'uppercase', fontWeight: 'bold' }}>{title}</Text>
+                        </TouchableOpacity>
+                    )
+                )}
+            </View>
+    )
+}
+
+export { InputFormFile }
