@@ -212,7 +212,7 @@ export function Login() {
 
                 <View style={styles.boxRememberPaswd}>
                   <TouchableOpacity style={styles.styleTouchable} onPress={() => { setForgotPasswd(true) }}>
-                    <Text style={styles.rememberPasswd}>Esqueci a senha</Text>
+                    <Text style={styles.rememberPasswd}>Esqueci minha senha</Text>
                   </TouchableOpacity>
                 </View>
               </>

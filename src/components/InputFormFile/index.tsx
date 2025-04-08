@@ -27,7 +27,7 @@ const InputFormFile = ({ title, label, defaultValue, onChangeImage, ...rest }: I
 
             setLoading(true)
 
-            const { data } = await axios.post<{ url: string }>(`${API_BASE_URL}/upload`, formData, {
+            const { data } = await axios.post<{ url: string }>(`https://api-sergio.onrender.com/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }

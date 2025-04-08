@@ -1,9 +1,9 @@
 {
   "expo": {
     "name": "Sistema de Gerenciamento de Atléticas",
-    "owner": "vianaandre",
+    "owner": "sergiocerberus",
     "slug": "sistema-de-gerenciamento-de-atleticas",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vianaandre.sistemadegerenciamentodeatleticas"
+      "bundleIdentifier": "com.sergiocardoso.sistemadegerenciamentodeatleticas"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.vianaandre.sistemadegerenciamentodeatleticas"
+      "package": "com.sergiocardoso.sistemadegerenciamentodeatleticas"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"

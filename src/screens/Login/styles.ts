@@ -54,7 +54,7 @@ export const styles = StyleSheet.create({
     marginBottom: 24
   },
   styleTouchable: {
-    width: 140,
+    width: 152,
     marginEnd: 30,
   },
   rememberPasswd: {
