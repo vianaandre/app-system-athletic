@@ -40,7 +40,8 @@
     "react-native-toast-message": "^2.2.0",
     "react-test-renderer": "^18.3.1",
     "rimraf": "^6.0.1",
-    "sudo-prompt": "^9.2.1"
+    "sudo-prompt": "^9.2.1",
+    "expo-dev-client": "~5.0.19"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

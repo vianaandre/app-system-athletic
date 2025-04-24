@@ -88,7 +88,7 @@ export function RegisterChampionships() {
             }
         } catch (error) {
             console.error('Erro ao salvar campeonato:', error);
-            Alert.alert('Erro', 'Falha comunicação com servidor. Tente novamente.');
+            Alert.alert('Erro', 'Preencha os campos obrigatorios !');
         }
     }
 

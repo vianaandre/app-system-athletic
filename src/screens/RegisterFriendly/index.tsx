@@ -43,6 +43,13 @@ export function RegisterFriendly() {
 
     const handleSubmit = async () => {
         const parserDate = parse(date, 'dd/MM/yyyy', new Date())
+        const today = new Date()
+        today.setHours(0, 0, 0, 0) 
+
+        if(parserDate < today) {
+            Alert.alert('ATENÇÃO', 'A data informada não pode ser anterior a data atual!');
+            return
+        }
 
         const formattedDate = format(parserDate, "yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -84,7 +91,7 @@ export function RegisterFriendly() {
             }
         } catch (error) {
             console.error('Erro ao salvar amistoso:', error);
-            Alert.alert('Erro', 'Falha comunicação com servidor. Tente novamente.');
+            Alert.alert('Erro', 'Preencha os campos obrigatorios !');
         }
     };
 
@@ -94,83 +101,83 @@ export function RegisterFriendly() {
     }
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <SafeAreaView style={styles.safeArea}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={{
-                        flex: 1,
-                    }}
-                >
-                    <ScrollView contentContainerStyle={{
-                        flexGrow: 1,
-                        justifyContent: 'flex-start',
-                        alignItems: 'center',                    
-                    }}>
-                        <Header
-                            title={isEditMode ? ' Alterar Amistoso' : `Cadastrar Amistoso`}
-                            subtitle={isEditMode ? 'Alterar amistoso no sistema' : 'Cadastrar amistoso no sistema'}
-                            userImage={require('../../assets/img/Logos/logo3.png')}
-                            handleClickDisconnect={logout}
+        // <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={styles.safeArea}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{
+                    flex: 1,
+                }}
+            >
+                <ScrollView contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',                    
+                }}>
+                    <Header
+                        title={isEditMode ? ' Alterar Amistoso' : `Cadastrar Amistoso`}
+                        subtitle={isEditMode ? 'Alterar amistoso no sistema' : 'Cadastrar amistoso no sistema'}
+                        userImage={require('../../assets/img/Logos/logo3.png')}
+                        handleClickDisconnect={logout}
+                    />
+
+                    <View style={styles.containerInputs}>
+                        <InputFormText 
+                            label='Descrição:*'
+                            value={description}
+                            onChangeText={setDescription}
                         />
 
-                        <View style={styles.containerInputs}>
-                            <InputFormText 
-                                label='Descrição:*'
-                                value={description}
-                                onChangeText={setDescription}
+                        <InputFormText 
+                            label='Modalidade:*'
+                            value={modality}
+                            onChangeText={setModality}
+                        />
+
+                        <View style={{ width: 142 }}>
+                            <InputFormTextMaskDatetime
+                                label=' Data:*'
+                                value={date}
+                                onChangeText={setDate}
+                                placeholder="DD/MM/YYYY"
                             />
-
-                            <InputFormText 
-                                label='Modalidade:*'
-                                value={modality}
-                                onChangeText={setModality}
-                            />
-
-                            <View style={{ width: 142 }}>
-                                <InputFormTextMaskDatetime
-                                    label=' Data:*'
-                                    value={date}
-                                    onChangeText={setDate}
-                                    placeholder="DD/MM/YYYY"
-                                />
-                            </View>
-
-                            <InputFormText 
-                                label='Local:*'
-                                value={locale}
-                                onChangeText={setLocale}
-                            />
-
-                            <View style={{ width: 182 }}>
-                                <InputFormText 
-                                    label='Resultado:'
-                                    value={result}
-                                    onChangeText={setResult}
-                                />
-                            </View>
-
-
-                            <View style={styles.switchContainer}>
-                                <Text style={styles.switchLabel}>Amistoso Ativo</Text>
-                                <Switch
-                                    value={on}
-                                    onValueChange={toggleSwitch}
-                                    trackColor={{false: '#767577', true: '#48C445'}}
-                                    thumbColor={on ? '#FFFFFF' : '#f4f3f4'}
-                                />
-                            </View>
                         </View>
 
-                        {!isKeyboardVisible && (
-                            <View style={styles.containerButtons}>
-                                <ReturnButton label="Cancelar" handleClick={() => navigation.goBack()} />
-                                <AddButton label={isEditMode ? 'Confirmar' : 'Cadastrar'} handleClick={handleSubmit} />
-                            </View>
-                        )}
-                    </ScrollView>
-                </KeyboardAvoidingView>
-            </SafeAreaView>
-        </TouchableWithoutFeedback >
+                        <InputFormText 
+                            label='Local:*'
+                            value={locale}
+                            onChangeText={setLocale}
+                        />
+
+                        <View style={{ width: 182 }}>
+                            <InputFormText 
+                                label='Resultado:'
+                                value={result}
+                                onChangeText={setResult}
+                            />
+                        </View>
+
+
+                        <View style={styles.switchContainer}>
+                            <Text style={styles.switchLabel}>Amistoso Ativo</Text>
+                            <Switch
+                                value={on}
+                                onValueChange={toggleSwitch}
+                                trackColor={{false: '#767577', true: '#48C445'}}
+                                thumbColor={on ? '#FFFFFF' : '#f4f3f4'}
+                            />
+                        </View>
+                    </View>
+
+                    {!isKeyboardVisible && (
+                        <View style={styles.containerButtons}>
+                            <ReturnButton label="Cancelar" handleClick={() => navigation.goBack()} />
+                            <AddButton label={isEditMode ? 'Confirmar' : 'Cadastrar'} handleClick={handleSubmit} />
+                        </View>
+                    )}
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+        // </TouchableWithoutFeedback >
     );
 }

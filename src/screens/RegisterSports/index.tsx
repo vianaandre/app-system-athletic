@@ -93,7 +93,7 @@ export function RegisterSports() {
             }
         } catch (error) {
             console.error('Erro ao salvar esporte:', error);
-            Alert.alert('Erro', 'Falha comunicação com servidor. Tente novamente.');
+            Alert.alert('Erro', 'Preencha os campos obrigatorios !');
         }
 
     };

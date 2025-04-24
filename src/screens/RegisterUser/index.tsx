@@ -103,7 +103,7 @@ export function RegisterUser() {
                 }
             } catch (error) {
                 console.error('Erro ao salvar atlética:', error);
-                Alert.alert('Erro', 'Essa atlética já foi cadastrada.');
+                Alert.alert('Erro', 'Preencha os campos obrigatorios !');
             }
         }
     };

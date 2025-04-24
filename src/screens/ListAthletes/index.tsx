@@ -9,7 +9,6 @@ import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/nativ
 import { logout } from '../../utils/logout';
 import { requestApi } from '../../utils/requestApi';
 import { getToken } from '../../utils/getToken';
-import { ISport } from '../../Models/Sports';
 import { IAthlete } from '../../Models/Athlete';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -179,85 +178,81 @@ export function ListAthletes() {
     }, [isAthletesActive, listAthetesByTeams]);
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={styles.safeArea}>
 
-                <Header
-                    title={'Atletas'}
-                    subtitle={`(${team.name})`}
-                    userImage={require('../../assets/img/Logos/logo3.png')}
-                    handleClickDisconnect={disconnect} />
-                <View style={styles.container}>
-                    {listAthetesByTeams && listAthetesByTeams.length > 0 && (
-                        <View style={styles.switchContainer}>
-                            <Text style={styles.switchLabel}>Atletas {isAthletesActive ? 'Ativos' : 'Inativos'}</Text>
-                                <Switch
-                                    value={on}
-                                    onValueChange={toggleSwitch}
-                                    trackColor={{false: '#767577', true: '#48C445'}}
-                                    thumbColor={on ? '#FFFFFF' : '#f4f3f4'}
-                                />
-                        </View>
-                    )}
-                    {!loading ? (
-                        <FlatList
-                            data={filterAthletes}
-                            keyExtractor={item => item.id.toString()}
-                            renderItem={({ item }) => (
-                                <View style={styles.containerList} >
-                                    <View style={styles.containerImageAthlete}>
-                                        {item.athlete_image && (
-                                            <Image style={styles.imageAtleta} resizeMode='contain'
-                                                source={{
-                                                uri: item.athlete_image
-                                            }} />
-                                        )}
-                                        <View >
-                                            <Text style={styles.textNameAthlete}>{item.name}</Text>
-                                            <Text style={styles.textCoursePeriodAthlete}>{item.course}</Text>
-                                            <Text style={styles.textCoursePeriodAthlete}>{item.period} Período</Text>
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.containerEditRemoveButton}>
-                                        {item.is_active && (
-                                            <RemoveButton handleClick={() => { handleDeleteClick(item) }} />
-                                        )}
-                                        <EditButton handleClick={() => { handleEditClick(item) }} />
-                                    </View>
-
-                                </View>
-                            )}
-                            ListEmptyComponent={() =>
-                                <View style={{
-                                    alignItems: 'center',
-                                    marginVertical: 42
-                                }}>
-                                    <Text style={styles.textEmpty}>Sem Atletas Cadastrados</Text>
-                                </View>
-                            }
-                        />
-                    ) : (
-                        <View style={{ alignItems: 'center', marginVertical: 42 }}>
-                            <ActivityIndicator size="large" color="#48C445" />
-                        </View>
-                    )}
-
-                    <View style={styles.containerButtons}>
-                        <ReturnButton label='Voltar'
-                            handleClick={() => { navigation.goBack() }} />
-
-                        <DownloadButton label='Exportar PDF'
-                            handleClick={handleDownloadPDF} />
-
-                        <AddButton label='Adicionar Atleta'
-                            handleClick={() => { navigation.navigate('RegisterAthlete', { isEditing: false, team: team }) }}
-                        />
+            <Header
+                title={'Atletas'}
+                subtitle={`(${team?.name})`}
+                userImage={require('../../assets/img/Logos/logo3.png')}
+                handleClickDisconnect={disconnect} />
+            <View style={styles.container}>
+                {listAthetesByTeams && listAthetesByTeams.length > 0 && (
+                    <View style={styles.switchContainer}>
+                        <Text style={styles.switchLabel}>Atletas {isAthletesActive ? 'Ativos' : 'Inativos'}</Text>
+                            <Switch
+                                value={on}
+                                onValueChange={toggleSwitch}
+                                trackColor={{false: '#767577', true: '#48C445'}}
+                                thumbColor={on ? '#FFFFFF' : '#f4f3f4'}
+                            />
                     </View>
+                )}
+                {!loading ? (
+                    <FlatList
+                        data={filterAthletes}
+                        keyExtractor={item => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <View style={styles.containerList} >
+                                <View style={styles.containerImageAthlete}>
+                                    {item.athlete_image && (
+                                        <Image style={styles.imageAtleta} resizeMode='contain'
+                                            source={{
+                                            uri: item.athlete_image
+                                        }} />
+                                    )}
+                                    <View >
+                                        <Text style={styles.textNameAthlete}>{item.name}</Text>
+                                        <Text style={styles.textCoursePeriodAthlete}>{item.course}</Text>
+                                        <Text style={styles.textCoursePeriodAthlete}>{item.period} Período</Text>
+                                    </View>
+                                </View>
 
+                                <View style={styles.containerEditRemoveButton}>
+                                    {item.is_active && (
+                                        <RemoveButton handleClick={() => { handleDeleteClick(item) }} />
+                                    )}
+                                    <EditButton handleClick={() => { handleEditClick(item) }} />
+                                </View>
+
+                            </View>
+                        )}
+                        ListEmptyComponent={() =>
+                            <View style={{
+                                alignItems: 'center',
+                                marginVertical: 42
+                            }}>
+                                <Text style={styles.textEmpty}>Sem Atletas Cadastrados</Text>
+                            </View>
+                        }
+                    />
+                ) : (
+                    <View style={{ alignItems: 'center', marginVertical: 42 }}>
+                        <ActivityIndicator size="large" color="#48C445" />
+                    </View>
+                )}
+
+                <View style={styles.containerButtons}>
+                    <ReturnButton label='Voltar'
+                        handleClick={() => { navigation.goBack() }} />
+
+                    <DownloadButton label='Exportar PDF'
+                        handleClick={handleDownloadPDF} />
+
+                    <AddButton label='Adicionar Atleta'
+                        handleClick={() => { navigation.navigate('RegisterAthlete', { isEditing: false, team: team }) }}
+                    />
                 </View>
-
-            </SafeAreaView>
-        </TouchableWithoutFeedback >
+            </View>
+        </SafeAreaView>
     );
 }

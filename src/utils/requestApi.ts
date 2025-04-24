@@ -10,7 +10,7 @@ export const requestApi = async (
   headers?: Record<string, string>,
   responseType?: ResponseType
 ) => {
-  const baseUrl = 'https://api-sergio.onrender.com';
+  const baseUrl = 'https://api.xyzonline.site';
 
   try {
     const baseRequest: AxiosRequestConfig = {

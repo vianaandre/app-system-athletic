@@ -4,6 +4,8 @@ import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { API_BASE_URL } from '@env';
+import { Platform } from "react-native";
+import { requestApi } from "../../utils/requestApi";
 
 interface IInputFormFile extends ButtonProps {
     label: string;
@@ -19,34 +21,43 @@ const InputFormFile = ({ title, label, defaultValue, onChangeImage, ...rest }: I
     const uploadImage = async (file: ImagePicker.ImagePickerAsset) => {
         try {
             const formData = new FormData()
+                        
             formData.append('file', {
-                name: file.fileName || 'image.jpeg',
-                type: file.type || 'image/jpeg',
-                uri: file.uri
+                uri: file.uri,
+                name: file.fileName ?? 'profile.png',
+                type: 'image/jpeg'
             } as any)
 
             setLoading(true)
-
-            const { data } = await axios.post<{ url: string }>(`https://api-sergio.onrender.com/upload`, formData, {
+            
+            const response = await fetch('https://api.xyzonline.site/upload', {
+                method: 'POST',
+                body: formData,
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    'Accept': 'application/json',
                 }
             });
 
-            setFile(data.url);
-            onChangeImage(data.url)
+            const responseJson = await response.json()
+
+            setFile(responseJson.url);
+            onChangeImage(responseJson.url)
 
             setLoading(false)
         } catch(err) {
             setLoading(false)
-            console.error(err)
+            console.error('Upload error:', {
+                error: err,
+                message: err instanceof Error ? err.message : 'Unknown error',
+                response: err instanceof axios.AxiosError ? err.response?.data : null
+            });
             Alert.alert('Erro', 'Erro ao enviar imagem');
         }
     }
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: ['images'],
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,

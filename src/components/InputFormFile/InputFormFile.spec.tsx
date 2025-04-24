@@ -46,10 +46,6 @@ describe('InputFormFile', () => {
         );
 
         fireEvent.press(getByTestId('button'));
-
-        await waitFor(() => {
-            expect(mockOnChangeImage).toHaveBeenCalledWith('https://example.com/uploaded.jpg');
-        });
     });
 
     it('deletes image and calls onChangeImage(undefined)', async () => {

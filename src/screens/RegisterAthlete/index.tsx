@@ -32,15 +32,13 @@ export function RegisterAthlete() {
     const route = useRoute();
     const { athlete: athlete, isEditing, team } = route.params as routeParams;
 
-    const isKeyboardVisible = useKeyboardVisibility();
-
     const [athleteName, setAthleteName] = useState<string>(isEditing ? athlete?.name : '');
     const [athleteNumber, setAthleteNumber] = useState<string>(isEditing ? athlete?.number : '');
     const [athleteCourse, setAthleteCourse] = useState<string>(isEditing ? athlete?.course : '');
     const [athletePeriod, setAthletePeriod] = useState<number>(isEditing ? athlete?.period : 0);
     const [athleteImage, setAthleteImage] = useState<string | undefined>(athlete?.athlete_image);
     const [athleteProofRegistration, setAthleteProofRegistration] = useState<string | undefined>(athlete?.proof_registration);
-    const [athleteRegistration, setAthleteRegistration] = useState<string>(isEditing ? athlete?.registration : '');
+    const [athleteRegistration, setAthleteRegistration] = useState<string | undefined>(isEditing ? (athlete?.registration === '1' ? undefined : athlete?.registration) : '');
     const [athleteCpf, setAthleteCpf] = useState<string>(isEditing ? athlete?.cpf : '');
     const [cpfUnmasked, setCpfUnmasked] = useState<any>();
     const [isAthleteActive, setIsAthleteActive] = useState<boolean>(isEditing && athlete ? Boolean(athlete.is_active) : true);
@@ -48,18 +46,21 @@ export function RegisterAthlete() {
 
     const handleSubmit = async () => {
         const unmaskedCpfAthlete = cpfUnmasked.getRawValue()
+
         const clientPayload = {
             name: athleteName,
             number: athleteNumber,
             course: athleteCourse,
             period: athletePeriod,
-            athlete_image: athleteImage,
-            proof_registration: athleteProofRegistration,
-            registration: athleteRegistration,
+            athlete_image: athleteImage ?? undefined,
+            proof_registration: athleteProofRegistration ?? undefined,
+            registration: athleteRegistration ?? undefined,
             cpf: unmaskedCpfAthlete,
             team_id: team.id,
             is_active: isAthleteActive
         };
+
+        console.log('clientPayload', clientPayload)
 
         try {
             const token = await getToken();
@@ -76,6 +77,8 @@ export function RegisterAthlete() {
                     },
                 ]);
             } else {
+                console.log('clientPayload 222', clientPayload)
+
                 await requestApi('/athletes', 'POST', clientPayload, {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -89,7 +92,7 @@ export function RegisterAthlete() {
             }
         } catch (error) {
             console.error('Erro ao salvar atleta:', error);
-            Alert.alert('Erro', 'Falha comunicação com servidor. Tente novamente.');
+            Alert.alert('Erro', 'Preencha os campos obrigatorios !');
         }
     }
 
@@ -100,7 +103,7 @@ export function RegisterAthlete() {
 
 
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ backgroundColor: BG_DEFAULT }}>
+        // <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ backgroundColor: BG_DEFAULT }}>
             <KeyboardAvoidingView
                 style={{ flex: 1, backgroundColor: BG_DEFAULT }}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -150,14 +153,14 @@ export function RegisterAthlete() {
 
                                 <View style={{ marginTop: 24, gap: 24, marginBottom: 24 }}>
                                     <InputFormFile 
-                                        label='Imagem do atleta:*'
+                                        label='Imagem do atleta:'
                                         onChangeImage={setAthleteImage}
                                         title='Carregar Imagem'
                                         defaultValue={athleteImage}
                                     />
 
                                     <InputFormFile 
-                                        label='Comprovante de matrícula:*'
+                                        label='Comprovante de matrícula:'
                                         onChangeImage={setAthleteProofRegistration}
                                         title='Comprovante de matrícula'
                                         defaultValue={athleteProofRegistration}
@@ -178,7 +181,7 @@ export function RegisterAthlete() {
                                     </View>
                                     <View style={{ flex: 1 }} >
                                         <InputFormText 
-                                            label='Número matrícula:*'
+                                            label='Número matrícula:'
                                             value={athleteRegistration}
                                             placeholder='xxxxxxxxxxxxxx'
                                             onChangeText={setAthleteRegistration} />
@@ -204,6 +207,6 @@ export function RegisterAthlete() {
 
                 </SafeAreaView>
             </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+        // </TouchableWithoutFeedback>
     );
 }

@@ -85,7 +85,7 @@ export function RegisterSportEquipment() {
             }
         } catch (error) {
             console.error('Erro ao salvar equipamento esportivo:', error);
-            Alert.alert('Erro', 'Falha comunicação com servidor. Tente novamente.');
+            Alert.alert('Erro', 'Preencha os campos obrigatorios !');
         }
     };
 
