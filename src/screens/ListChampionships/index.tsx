@@ -115,7 +115,7 @@ export function ListChampionships() {
                 <View style={styles.container}>
                     {listChampionships && listChampionships.length > 0 && (
                         <View style={styles.switchContainer}>
-                            <Text style={styles.switchLabel}>Equipes {isChampionshipActive ? 'Ativas' : 'Inativas'}</Text>
+                            <Text style={styles.switchLabel}>Campeonatos {isChampionshipActive ? 'Ativos' : 'Inativos'}</Text>
                             <Switch
                                 value={on}
                                 onValueChange={toggleSwitch}

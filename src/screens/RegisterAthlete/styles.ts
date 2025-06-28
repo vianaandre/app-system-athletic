@@ -31,6 +31,7 @@ export const styles = StyleSheet.create({
   labelInputs: {
     fontSize: 16,
     color: "#FFFFFF",
+    paddingBottom: 16
   },
   placeholderInput: {
     width: '100%',

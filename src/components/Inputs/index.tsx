@@ -16,7 +16,9 @@ interface IInput {
 
 const InputText = ({ placeholder, label, value, onChangeText, keyboardType, autoCorrect, disabled }: IInput) => {
     return (
-        <View style={styles.boxInputs}> 
+        <View style={[styles.boxInputs, {
+            opacity: disabled ? 0.5 : 1
+        }]}> 
             <Text style={styles.labelInputs}>{label}</Text>
             <TextInput 
                 style={styles.placeholderInput}

@@ -1,7 +1,7 @@
 export interface IChampionship {
     id: string;
     description: string;
-    modality: string;
+    teams: string;
     start_date: Date;
     end_date: Date;
     location: string;

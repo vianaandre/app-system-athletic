@@ -10,4 +10,5 @@ export interface IAthlete {
   cpf: string;
   sport_id: string;
   is_active: boolean;
+  team_id?: string;
 }

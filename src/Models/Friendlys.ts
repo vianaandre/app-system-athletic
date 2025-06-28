@@ -2,7 +2,7 @@ export interface IFriendlys {
     created_at: string;
     description: string;
     id: string;
-    modality: string;
+    teams: string;
     date: string;
     location: string;
     results: string;

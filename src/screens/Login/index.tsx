@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import { getToken } from '../../utils/getToken';
 import { useKeyboardVisibility } from '../../utils/useKeyboardVisibility';
 import { useAuth } from '../../hook/useAuth';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function Login() {
   const navigation = useNavigation()
@@ -41,6 +41,8 @@ export function Login() {
       const response = await requestApi('/authenticate', 'POST', loginData);
       const userData = response.data;
 
+      await AsyncStorage.setItem('user_athletic', JSON.stringify(athleticName));
+
       await storeToken(userData.token);
 
       Toast.show({
@@ -54,7 +56,6 @@ export function Login() {
 
 
     } catch (error) {
-      console.error('Login error:', error);
       Alert.alert('FALHA AO REALIZAR LOGIN', 'Verifique se digitou "Nome da Atlética" e "Senha" corretamente e tente novamente.');
     }
   };
@@ -151,6 +152,18 @@ export function Login() {
       Alert.alert('Erro', 'Não foi possível carregar o usuário.');
     }
   }
+
+  async function getAthleticName() {
+    const athleticName = await AsyncStorage.getItem('user_athletic');
+
+    if(athleticName) {
+      setAthleticName(JSON.parse(athleticName))
+    }
+  }
+
+  useEffect(() => {
+    getAthleticName()
+  }, [])
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -269,20 +282,22 @@ export function Login() {
                           />
                       )}
                     </View>
-                    <View>
+                    {sendCodeRequest && (
                       <View>
-                          <TouchableOpacity 
-                            style={[styles.styleTouchable, {
-                              width: '100%'
-                            }]} 
-                            onPress={handleSendCode}
-                          >
-                            <Text style={[styles.rememberPasswd, {
-                              marginTop: 70,
-                            }]}>Enviar código novamente</Text>
-                          </TouchableOpacity>
-                        </View>
-                    </View>
+                        <View>
+                            <TouchableOpacity 
+                              style={[styles.styleTouchable, {
+                                width: '100%'
+                              }]} 
+                              onPress={handleSendCode}
+                            >
+                              <Text style={[styles.rememberPasswd, {
+                                marginTop: 70,
+                              }]}>Enviar código novamente</Text>
+                            </TouchableOpacity>
+                          </View>
+                      </View>
+                    )}
                   </>
                 ) : (
                   <>

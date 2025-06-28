@@ -19,8 +19,8 @@ describe('InputFormText', () => {
         );
 
         const input = getByPlaceholderText('Digite');
-        fireEvent.changeText(input, 'Andre');
-        expect(mockFn).toHaveBeenCalledWith('Andre');
+        fireEvent.changeText(input, 'Qualquer');
+        expect(mockFn).toHaveBeenCalledWith('Qualquer');
     });
 });
 

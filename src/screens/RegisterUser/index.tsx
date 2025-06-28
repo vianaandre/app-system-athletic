@@ -29,9 +29,10 @@ export function RegisterUser() {
     const navigation = useNavigation();
 
     const route = useRoute();
-    const { isAdmUser, isEditing, firstRegister, user } = route.params as RouteParams;
+    const { isAdmUser, isEditing, firstRegister, user: userRoute } = route.params as RouteParams;
+    const { user: userAuth } = useAuth()
 
-    //const { user } = useAuth()
+    const user = userRoute || userAuth
 
     const isKeyboardVisible = useKeyboardVisibility();
 
@@ -40,13 +41,49 @@ export function RegisterUser() {
 
     const userImage = firstRegister ? null : require('../../assets/img/imageAdm.png');
 
-    const [userName, setUserName] = useState(isEditing ? user.athletic : '');
-    const [userNumber, setUserNumber] = useState(isEditing ? user.number : '');
+    const [userName, setUserName] = useState(isEditing ? user?.athletic : '');
+    const [userNumber, setUserNumber] = useState(isEditing ? user?.number : '');
     const [userPassword, setUserPassword] = useState('');
     const [userConfirmPassword, setUserConfirmPassword] = useState('');
-    const [userLogo, setUserLogo] = useState<string | undefined>();
-    const [isUserActive, setIsUserActive] = useState<boolean>(isEditMode && user ? Boolean(user.is_active) : true);
-    const [on, off] = useState(isEditMode && user ? Boolean(user.is_active) : true);
+    const [userLogo, setUserLogo] = useState<string | undefined>(isEditMode && user ? user?.logo : undefined);
+    const [isUserActive, setIsUserActive] = useState<boolean>(isEditMode && user ? Boolean(user?.is_active) : true);
+    const [on, off] = useState(isEditMode && user ? Boolean(user?.is_active) : true);
+
+    const validateUser = () => {
+        let isValid = true;
+
+        if(userName === '' || !userName) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM O NOME', 'O nome da atlética é obrigatório.');
+        }
+
+        if(userNumber === '' || !userNumber) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM O NÚMERO', 'O número de telefone é obrigatório.');
+        }
+
+        if(userPassword === '' || !userPassword) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM A SENHA', 'A senha da atlética é obrigatória.');
+        }
+
+        if(userConfirmPassword === '' || !userConfirmPassword) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM A CONFIRMAÇÃO DE SENHA', 'A confirmação de senha da atlética é obrigatória.');
+        }
+
+        if(userConfirmPassword !== userPassword) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM AS SENHAS', 'As senhas informadas não são iguais.');
+        }
+
+        if(userLogo === '' || !userLogo) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM A LOGO', 'A logo da atlética é obrigatória.');
+        }
+
+        return isValid;
+    }
 
     const handleSubmit = async () => {
         const clientPayload = {
@@ -58,13 +95,8 @@ export function RegisterUser() {
             is_active: isUserActive
         };
 
-        if (userPassword !== userConfirmPassword) {
-            return Alert.alert('PROBLEMA COM SENHAS', 'As senhas informadas não são iguais ou os campos estão vazios.',
-                [
-                    {
-                        text: 'OK', onPress: () => setUserConfirmPassword('')
-                    }
-                ]);
+        if (!validateUser()) {
+            return;
         } else {
             try {
                 const token = await getToken();
@@ -138,36 +170,37 @@ export function RegisterUser() {
                 />
                 <ScrollView style={styles.container}>
                     <View style={styles.containerInputs}>
-                        <InputFormText label='Atlética:'
+                        <InputFormText label='Atlética:*'
                             value={userName}
                             onChangeText={setUserName} />
 
-                        <InputFormTextMask label='Número:'
+                        <InputFormTextMask label='Número:*'
                             value={userNumber}
                             onChangeText={setUserNumber}
                             onBlur={() => validatePhoneNumber(userNumber)}
                         />
 
-                        <InputFormText label='Senha:'
+                        <InputFormText label='Senha:*'
                             secureTextEntry={true}
                             autoCorrect={false}
                             value={userPassword}
                             onChangeText={setUserPassword} />
 
-                        <InputFormText label='Confirmar senha:'
+                        <InputFormText label='Confirmar senha:*'
                             secureTextEntry={true}
                             autoCorrect={false}
                             value={userConfirmPassword}
                             onChangeText={setUserConfirmPassword} />
 
                         <InputFormFile
-                            label='Logo:'
+                            label='Logo:*'
                             title='Selecione uma logo'
                             onChangeImage={setUserLogo}
+                            defaultValue={userLogo}
                         />
 
                         <View style={styles.switchContainer}>
-                            <Text style={styles.switchLabel}>Manter equipe ativa</Text>
+                            <Text style={styles.switchLabel}>Manter atlética ativa</Text>
                             <Switch
                                 value={on}
                                 onValueChange={toggleSwitch}

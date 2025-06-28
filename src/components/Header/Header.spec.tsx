@@ -7,6 +7,7 @@ jest.mock('../../hook/useAuth', () => ({
         user: {
             logo: 'https://example.com/user.png',
         },
+        setUser: jest.fn(),
     }),
 }));
 

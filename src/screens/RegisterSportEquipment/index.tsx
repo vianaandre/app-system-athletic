@@ -37,13 +37,43 @@ export function RegisterSportEquipment() {
     const [sport, setSport] = useState<string>(sportEquipment?.sport ?? '');
     const [materialCarrier, setMaterialCarrier] = useState<string>(sportEquipment?.material_carrier ?? '');
     const [phone, setPhone] = useState<string>(sportEquipment?.phone ?? '');
-    const [price, setPrice] = useState<string>(sportEquipment?.price ?? '');
+    const [price, setPrice] = useState<string>(sportEquipment?.price ? String(Number(sportEquipment?.price ?? 0) * 100) : '');
     const [image, setImage] = useState<string | undefined>(sportEquipment?.image ?? '');
     const [priceUnmasked, setPriceUnmasked] = useState<any>();
     const [isSportEquipmentActive, setIsSportEquipmentActive] = useState<boolean>(isEditMode && sportEquipment ? Boolean(sportEquipment.is_active) : true);
-    const [on, off] = useState(isEditMode && sportEquipment ? Boolean(sportEquipment.is_active) : true);//estado do switch
+    const [on, off] = useState(isEditMode && sportEquipment ? Boolean(sportEquipment.is_active) : true);
+
+    const validatedForm = () => {
+        let isValid = true;
+
+        if(sportEquipmentName === '' || sportEquipmentName === undefined) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM A DESCRIÇÃO', 'A descrição do material esportivo é obrigatória.');
+        }
+
+        if(materialCarrier === '' || materialCarrier === undefined) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM O PORTADOR', 'O portador do material é obrigatório.');
+        }
+        
+        if(phone === '' || phone === undefined) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM O NÚMERO', 'O número de telefone é obrigatório.');
+        }
+
+        if(price === '' || price === undefined) {
+            isValid = false;
+            return Alert.alert('PROBLEMA COM O PREÇO', 'O preço do material esportivo é obrigatório.');
+        }
+
+        return isValid;
+    }
 
     const handleSubmit = async () => {
+        if(!validatedForm()) {
+            return;
+        }
+
         const unmaskedPrice = priceUnmasked.getRawValue()
 
         const sportEquipmentPayload = {

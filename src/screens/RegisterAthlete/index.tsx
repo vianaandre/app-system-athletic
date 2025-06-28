@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Switch, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../../components/Header';
@@ -18,6 +18,7 @@ import { InputFormFile } from '../../components/InputFormFile';
 import { ITeam } from '../../Models/Teams';
 import { InputText } from '../../components/Inputs';
 import { BG_DEFAULT } from '../../utils/styleDefaults';
+import { validationCPF } from '../../utils/validationCPF';
 
 type routeParams = {
     team: ITeam;
@@ -31,6 +32,8 @@ export function RegisterAthlete() {
 
     const route = useRoute();
     const { athlete: athlete, isEditing, team } = route.params as routeParams;
+    const [isEditingAthlete, setIsEditingAthlete] = useState<boolean>(isEditing);
+    const [editAtthlete, setEditAthlete] = useState<IAthlete | undefined>(athlete);
 
     const [athleteName, setAthleteName] = useState<string>(isEditing ? athlete?.name : '');
     const [athleteNumber, setAthleteNumber] = useState<string>(isEditing ? athlete?.number : '');
@@ -43,30 +46,39 @@ export function RegisterAthlete() {
     const [cpfUnmasked, setCpfUnmasked] = useState<any>();
     const [isAthleteActive, setIsAthleteActive] = useState<boolean>(isEditing && athlete ? Boolean(athlete.is_active) : true);
     const [on, off] = useState(isEditing && athlete ? Boolean(athlete.is_active) : true);
+    const [isDigitCPF, setIsDigitCPF] = useState<boolean>(false);
 
     const handleSubmit = async () => {
-        const unmaskedCpfAthlete = cpfUnmasked.getRawValue()
-
-        const clientPayload = {
-            name: athleteName,
-            number: athleteNumber,
-            course: athleteCourse,
-            period: athletePeriod,
-            athlete_image: athleteImage ?? undefined,
-            proof_registration: athleteProofRegistration ?? undefined,
-            registration: athleteRegistration ?? undefined,
-            cpf: unmaskedCpfAthlete,
-            team_id: team.id,
-            is_active: isAthleteActive
-        };
-
-        console.log('clientPayload', clientPayload)
-
         try {
+            const unmaskedCpfAthlete = cpfUnmasked?.getRawValue()
+
+            if(unmaskedCpfAthlete) {
+                const isValid = validationCPF(unmaskedCpfAthlete);
+
+                if(!isValid) {
+                    Alert.alert('PROBLEMA COM O CPF', 'O CPF informado é inválido.');
+
+                    return
+                }
+            }
+
+            const clientPayload = {
+                name: athleteName,
+                number: athleteNumber,
+                course: athleteCourse,
+                period: athletePeriod,
+                athlete_image: athleteImage ?? undefined,
+                proof_registration: athleteProofRegistration ?? undefined,
+                registration: athleteRegistration ?? undefined,
+                cpf: unmaskedCpfAthlete,
+                team_id: team?.id ?? athlete?.team_id,
+                is_active: isAthleteActive
+            };
+
             const token = await getToken();
 
-            if (isEditing) {
-                await requestApi(`/athletes/${athlete.id}`, 'PUT', clientPayload, {
+            if (isEditingAthlete) {
+                await requestApi(`/athletes/${editAtthlete?.id}`, 'PUT', clientPayload, {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 });
@@ -77,8 +89,6 @@ export function RegisterAthlete() {
                     },
                 ]);
             } else {
-                console.log('clientPayload 222', clientPayload)
-
                 await requestApi('/athletes', 'POST', clientPayload, {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -90,9 +100,14 @@ export function RegisterAthlete() {
                     },
                 ]);
             }
-        } catch (error) {
-            console.error('Erro ao salvar atleta:', error);
-            Alert.alert('Erro', 'Preencha os campos obrigatorios !');
+        } catch (error: any) {
+            if(error?.status === 400) {
+                Alert.alert('Erro', 'Atleta já cadastrado em outra equipe desse esporte !');
+            } else if(error?.status === 404) {
+                Alert.alert('Erro', 'Atleta já cadastrado em outra equipe desse esporte !');
+            } else {
+                Alert.alert('Erro', 'Preencha os campos obrigatorios !');
+            }
         }
     }
 
@@ -101,6 +116,54 @@ export function RegisterAthlete() {
         setIsAthleteActive(previousState => !previousState);
     }
 
+    async function getAthletaByCPF(cpf: string) {
+        try {
+            const token = await getToken();
+
+            const response = await requestApi(`/athletes/find/cpf/${cpf}`, 'GET', null, {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            })
+
+            setIsDigitCPF(true);
+
+            const athlete = response.data as  IAthlete; 
+
+            setAthleteName(athlete.name);
+            setAthleteNumber(athlete.number);
+            setAthleteCourse(athlete.course);
+            setAthletePeriod(athlete.period);
+            setAthleteImage(athlete.athlete_image);
+            setAthleteProofRegistration(athlete.proof_registration);
+            setAthleteRegistration(athlete.registration);
+            setIsAthleteActive(athlete.is_active);
+
+            setEditAthlete(athlete);
+            setIsEditingAthlete(true);
+        } catch(err) {
+            setIsDigitCPF(true);
+            setAthleteName('');
+            setAthleteNumber('');
+            setAthleteCourse('');
+            setAthletePeriod(0);
+            setAthleteImage(undefined);
+            setAthleteProofRegistration(undefined);
+            setAthleteRegistration(undefined);
+
+            setEditAthlete(undefined);
+            setIsEditingAthlete(false);
+        }
+    }
+
+    useEffect(() => {
+        if(athleteCpf && athleteCpf !== '') {
+            const cpf = athleteCpf.replace(/[^\d]/g, '');
+
+            if(cpf.length === 11) {
+                getAthletaByCPF(cpf)
+            }
+        }
+    }, [athleteCpf])
 
     return (
         // <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ backgroundColor: BG_DEFAULT }}>
@@ -119,13 +182,29 @@ export function RegisterAthlete() {
                     <View style={styles.container}>
                         <ScrollView style={{ maxWidth: '100%' }}>
                             <View style={styles.containerInputs}>
-                                
+                                <View
+                                    style={{
+                                        width: '100%',
+                                        marginBottom: 12
+                                    }}
+                                >
+                                    <Text style={styles.labelInputs} >CPF:*</Text>
+                                    <TextInputMask 
+                                        style={styles.placeholderInput}
+                                        value={athleteCpf}
+                                        onChangeText={setAthleteCpf}
+                                        placeholder='xxx.xxx.xxx-xx'
+                                        type={'cpf'}
+                                        ref={(ref) => setCpfUnmasked(ref)}
+                                    />
+                                </View>
                                 <InputText 
                                     label='Nome do atleta:*'
                                     autoCorrect={true}
                                     placeholder='Digite o nome do atleta'
                                     onChangeText={setAthleteName}
                                     value={athleteName}
+                                    disabled={!isDigitCPF}
                                 />
 
                                 <InputFormTextMask label='Número:*'
@@ -133,21 +212,28 @@ export function RegisterAthlete() {
                                     autoCorrect={false}
                                     value={athleteNumber}
                                     onChangeText={setAthleteNumber}
-                                    onBlur={() => validatePhoneNumber(athleteNumber)} />
+                                    onBlur={() => validatePhoneNumber(athleteNumber)} 
+                                    disabled={!isDigitCPF}
+                                />
 
                                 <View style={styles.inputs} >
                                     <View style={{ width: '70%', paddingRight: 21  }}>
                                         <InputFormText label='Curso:*'
                                             autoCorrect={false}
                                             value={athleteCourse}
-                                            onChangeText={setAthleteCourse} />
+                                            onChangeText={setAthleteCourse} 
+                                            disabled={!isDigitCPF}
+                                        />
                                     </View>
                                     <View style={{ width: '30%' }}>
-                                        <InputFormText label='Período:*'
-                                        keyboardType='numeric'
-                                        autoCorrect={false}
-                                        value={athletePeriod.toString()}
-                                        onChangeText={(text) => setAthletePeriod(Number(text))} />
+                                        <InputFormText 
+                                            label='Período:*'
+                                            keyboardType='numeric'
+                                            autoCorrect={false}
+                                            value={athletePeriod.toString()}
+                                            onChangeText={(text) => setAthletePeriod(Number(text))} 
+                                            disabled={!isDigitCPF}
+                                        />
                                     </View>
                                 </View>
 
@@ -157,6 +243,7 @@ export function RegisterAthlete() {
                                         onChangeImage={setAthleteImage}
                                         title='Carregar Imagem'
                                         defaultValue={athleteImage}
+                                        disabled={!isDigitCPF}
                                     />
 
                                     <InputFormFile 
@@ -164,27 +251,19 @@ export function RegisterAthlete() {
                                         onChangeImage={setAthleteProofRegistration}
                                         title='Comprovante de matrícula'
                                         defaultValue={athleteProofRegistration}
+                                        disabled={!isDigitCPF}
                                     />
                                 </View>
 
                                 <View style={{ flexDirection: 'row', gap: 16 }}>
-                                    <View style={{ flexDirection: 'column', gap: 16, width: '50%' }}>
-                                        <Text style={styles.labelInputs} >CPF:*</Text>
-                                        <TextInputMask 
-                                            style={styles.placeholderInput}
-                                            value={athleteCpf}
-                                            onChangeText={setAthleteCpf}
-                                            placeholder='xxx.xxx.xxx-xx'
-                                            type={'cpf'}
-                                            ref={(ref) => setCpfUnmasked(ref)}
-                                        />
-                                    </View>
                                     <View style={{ flex: 1 }} >
                                         <InputFormText 
-                                            label='Número matrícula:'
+                                            label='Número matrícula:*'
                                             value={athleteRegistration}
                                             placeholder='xxxxxxxxxxxxxx'
-                                            onChangeText={setAthleteRegistration} />
+                                            onChangeText={setAthleteRegistration} 
+                                            disabled={!isDigitCPF}
+                                        />
                                     </View>
                                 </View>
 
@@ -195,6 +274,7 @@ export function RegisterAthlete() {
                                         onValueChange={toggleSwitch}
                                         trackColor={{false: '#767577', true: '#48C445'}}
                                         thumbColor={on ? '#FFFFFF' : '#f4f3f4'}
+                                        disabled={!isDigitCPF}
                                     />
                                 </View>
                             </View>

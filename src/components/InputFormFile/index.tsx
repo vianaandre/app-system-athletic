@@ -1,6 +1,6 @@
 import { ActivityIndicator, Alert, Button, ButtonProps, Image, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { styles } from "./styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 import { API_BASE_URL } from '@env';
@@ -14,7 +14,7 @@ interface IInputFormFile extends ButtonProps {
 
 }
 
-const InputFormFile = ({ title, label, defaultValue, onChangeImage, ...rest }: IInputFormFile) => {
+const InputFormFile = ({ title, label, defaultValue, onChangeImage, disabled, ...rest }: IInputFormFile) => {
     const [file, setFile] = useState<string | undefined>(defaultValue);
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -68,6 +68,10 @@ const InputFormFile = ({ title, label, defaultValue, onChangeImage, ...rest }: I
         }
     };
 
+    useEffect(() => {
+        setFile(defaultValue)
+    }, [defaultValue])
+
     return (
             <View style={styles.boxInputs}>
                 <Text testID="label" style={styles.labelInputs} >{label}</Text>
@@ -100,8 +104,9 @@ const InputFormFile = ({ title, label, defaultValue, onChangeImage, ...rest }: I
                             marginTop: 10,
                             borderRadius: 12,
                             alignItems: 'center',
-                            justifyContent: 'center'
-                        }} {...rest} onPress={pickImage}>
+                            justifyContent: 'center',
+                            opacity: disabled ? 0.5 : 1
+                        }} {...rest} onPress={pickImage} disabled={disabled}>
                             <Text style={{ fontSize: 16, color: '#FFFFFF', textTransform: 'uppercase', fontWeight: 'bold' }}>{title}</Text>
                         </TouchableOpacity>
                     )

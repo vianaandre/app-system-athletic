@@ -24,9 +24,9 @@ describe('InputText', () => {
         );
 
         const input = getByPlaceholderText('Digite seu email');
-        fireEvent.changeText(input, 'andre@email.com');
+        fireEvent.changeText(input, 'example@email.com');
 
-        expect(mockFn).toHaveBeenCalledWith('andre@email.com');
+        expect(mockFn).toHaveBeenCalledWith('example@email.com');
     });
 
     it('is disabled when `disabled` is true', () => {
